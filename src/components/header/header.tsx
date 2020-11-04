@@ -1,22 +1,13 @@
-import PropTypes from "prop-types"
 import React from "react"
-import "./header.css"
+import styles from "./header.module.css"
 
-const Header = ({ siteTitle }) => (
+const Header = () => (
   <header>
-    <div className="container">
-      <p className="heading">virtual lollipop</p>
-      <p className="title">because we all know someone who deserves some sugar.</p>
+    <div className={styles.container}>
+      <p className={styles.heading}>virtual lollipop</p>
+      <p className={styles.title}>because we all know someone who deserves some sugar.</p>
     </div>
   </header>
 )
-
-Header.propTypes = {
-  siteTitle: PropTypes.string,
-}
-
-Header.defaultProps = {
-  siteTitle: ``,
-}
 
 export default Header

@@ -5,9 +5,9 @@ import Header from "./header/header"
 const Layout = ({ children }) => {
   return (
     <>
-      <Header siteTitle={`Title`} />
+      <Header/>
       <div>
-        <main>{children}</main>
+        <div>{children}</div>
       </div>
     </>
   )
