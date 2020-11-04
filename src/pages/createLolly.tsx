@@ -3,11 +3,24 @@ import Layout from "../components/layout"
 import Lolly from "../components/svg/svg"
 import styles from "./createLolly.module.css"
 
+interface initialValues {
+  senderName: string
+  reciptentName: string
+  msg: string
+}
+interface error {
+  stringError: string
+}
+const initialStateOfValues: initialValues = {
+  senderName: "",
+  reciptentName: "",
+  msg: "",
+}
 import { Formik } from "formik"
 const CreateLolly = () => {
-  const [lollyTop, setlollyTop] = useState("#f54c6b")
-  const [lollyMid, setlollyMid] = useState("#FF0000")
-  const [lollyBot, setlollyBot] = useState("#6e2633")
+  const [lollyTop, setlollyTop] = useState<string>("#f54c6b")
+  const [lollyMid, setlollyMid] = useState<string>("#FF0000")
+  const [lollyBot, setlollyBot] = useState<string>("#6e2633")
 
   return (
     <Layout>
@@ -52,25 +65,61 @@ const CreateLolly = () => {
           </div>
         </div>
         <Formik
-          initialValues={{ email: "", password: "" }}
-          validate={values => {}}
+          initialValues={initialStateOfValues}
+          validate={values => {
+            const errors: error = {
+              stringError: "",
+            }
+            if (
+              /^\s+$/.test(values.senderName) ||
+              /^\s+$/.test(values.msg) ||
+              /^\s+$/.test(values.reciptentName)
+            ) {
+              errors.stringError = "should contain string"
+            } else {
+              errors.stringError = ""
+            }
+          }}
           onSubmit={(values, { setSubmitting }) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2))
-              setSubmitting(false)
-            }, 400)
+            alert("handle submit is running")
+            values = {
+              msg: "",
+              reciptentName: "",
+              senderName: "",
+            }
           }}
         >
-          {() => (
+          {formik => (
             <div className={styles.lollyForm}>
-              <form className={styles.form}>
+              <form onSubmit={formik.handleSubmit} className={styles.form}>
                 <label>To</label>
-                <input type="text" placeholder="a lolly for" />
+                <input
+                  value={formik.values.reciptentName}
+                  onChange={formik.handleChange}
+                  name="reciptentName"
+                  required
+                  type="text"
+                  placeholder="a lolly for"
+                />
                 <label>Say something</label>
-                <textarea rows={9} cols={50} />
+                <textarea
+                  value={formik.values.msg}
+                  onChange={formik.handleChange}
+                  name="msg"
+                  required
+                  rows={9}
+                  cols={50}
+                />
                 <label>From</label>
-                <input type="text" value="" placeholder="a lolly form" />
-                <button className={styles.formBtn}>
+                <input
+                  value={formik.values.senderName}
+                  onChange={formik.handleChange}
+                  name="senderName"
+                  required
+                  type="text"
+                  placeholder="a lolly form"
+                />
+                <button type="submit" className={styles.formBtn}>
                   Freeze this lolly and get a link
                 </button>
               </form>
@@ -83,19 +132,4 @@ const CreateLolly = () => {
 }
 export default CreateLolly
 
-{
-  /* <div className={styles.lollyForm}> 
-              <form className={styles.form}>
-                 <label>To</label>
-                 <input type ="text"  placeholder="a lolly for"/>
-                 <label>Say something</label>
-                 <textarea rows={9} cols={50} />
-                 <label>From</label>
-                 <input type ="text" value="" placeholder="a lolly form"/>
-                 <button className={styles.formBtn}>Freeze this lolly and get a link</button>
-              </form>
-          </div> */
-}
-{
-  /* </div> */
-}
+
