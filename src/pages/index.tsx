@@ -1,4 +1,5 @@
 import React from "react"
+import {navigate} from 'gatsby'
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import Lolly from "../components/svg/svg"
@@ -14,7 +15,7 @@ const IndexPage = () => (
       <Lolly fillLollyTop ="#7885fa" fillLollyMiddle ="#3d4abf" fillLollyBottom="#2c347d"/>
       <Lolly fillLollyTop ="#d472e8" fillLollyMiddle ="pink" fillLollyBottom="#790391"/>
     </div>
-     <button className={styles.lollyBtn}>make a new lolly to send a friend</button>
+     <button onClick={()=>{navigate("/createLolly")}} className={styles.lollyBtn}>make a new lolly to send a friend</button>
     </div>
     
   </Layout>

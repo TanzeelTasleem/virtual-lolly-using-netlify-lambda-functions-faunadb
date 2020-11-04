@@ -21,6 +21,7 @@
     background-color: transparent;
     border: 2px solid #fa73d9;
     text-shadow: #fa73d9 0 0 16px;
+    box-shadow: #fa73d9 0 0 10px;
     border-radius: 25px;
     font-family: 'Yellowtail', cursive;
     cursor: pointer;
