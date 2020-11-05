@@ -2,5 +2,10 @@
   "name": "lolly",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server-lambda": "^2.19.0",
+    "faunadb": "^3.0.1",
+    "shortid": "^2.2.16"
+  }
 }

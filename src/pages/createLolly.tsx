@@ -1,11 +1,13 @@
 import React, { useState } from "react"
 import Layout from "../components/layout"
 import Lolly from "../components/svg/svg"
-import styles from "./createLolly.module.css"
+import Styles from "./createLolly.module.css"
+import { Formik, FormikErrors } from "formik"
+import { gql, useMutation } from "@apollo/client"
 
 interface initialValues {
   senderName: string
-  reciptentName: string
+  recipient: string
   msg: string
 }
 interface error {
@@ -13,28 +15,57 @@ interface error {
 }
 const initialStateOfValues: initialValues = {
   senderName: "",
-  reciptentName: "",
+  recipient: "",
   msg: "",
 }
-import { Formik } from "formik"
+
+const createVirtualLolly=gql`
+mutation createLolly(
+  $senderName: String!
+  $recipient: String!
+  $msg: String!
+  $lollyTop: String!
+  $lollyMid: String!
+  $lollyBotm: String!
+) {
+  createLolly(
+    senderName: $senderName
+    recipient: $recipient
+    msg: $msg
+    lollyTop: $lollyTop
+    lollyMid: $lollyMid
+    lollyBotm: $lollyBotm
+  ) {
+    senderName
+    msg
+    recipient
+    lollyTop
+    lollyMid
+    lollyBotm
+    lollyPath
+  }
+}
+
+`
+
 const CreateLolly = () => {
   const [lollyTop, setlollyTop] = useState<string>("#f54c6b")
   const [lollyMid, setlollyMid] = useState<string>("#FF0000")
   const [lollyBot, setlollyBot] = useState<string>("#6e2633")
-
+  const [createLolly] = useMutation(createVirtualLolly)
   return (
     <Layout>
-      <div className={styles.container}>
-        <div className={styles.box}>
+      <div className={Styles.container}>
+        <div className={Styles.box}>
           <Lolly
             fillLollyTop={lollyTop}
             fillLollyMiddle={lollyMid}
             fillLollyBottom={lollyBot}
           />
-          <div className={styles.colorPickers}>
-            <label className={styles.labelForPicker}>
+          <div className={Styles.colorPickers}>
+            <label className={Styles.labelForPicker}>
               <input
-                className={styles.picker}
+                className={Styles.picker}
                 type="color"
                 onChange={e => {
                   setlollyTop(e.target.value)
@@ -42,9 +73,9 @@ const CreateLolly = () => {
                 value={lollyTop}
               />
             </label>
-            <label className={styles.labelForPicker}>
+            <label className={Styles.labelForPicker}>
               <input
-                className={styles.picker}
+                className={Styles.picker}
                 type="color"
                 onChange={e => {
                   setlollyMid(e.target.value)
@@ -52,9 +83,9 @@ const CreateLolly = () => {
                 value={lollyMid}
               />
             </label>
-            <label className={styles.labelForPicker}>
+            <label className={Styles.labelForPicker}>
               <input
-                className={styles.picker}
+                className={Styles.picker}
                 type="color"
                 onChange={e => {
                   setlollyBot(e.target.value)
@@ -64,39 +95,35 @@ const CreateLolly = () => {
             </label>
           </div>
         </div>
-        <Formik
-          initialValues={initialStateOfValues}
-          validate={values => {
-            const errors: error = {
-              stringError: "",
-            }
-            if (
-              /^\s+$/.test(values.senderName) ||
-              /^\s+$/.test(values.msg) ||
-              /^\s+$/.test(values.reciptentName)
-            ) {
-              errors.stringError = "should contain string"
-            } else {
-              errors.stringError = ""
-            }
-          }}
-          onSubmit={(values, { setSubmitting }) => {
-            alert("handle submit is running")
-            values = {
-              msg: "",
-              reciptentName: "",
-              senderName: "",
-            }
-          }}
-        >
-          {formik => (
-            <div className={styles.lollyForm}>
-              <form onSubmit={formik.handleSubmit} className={styles.form}>
+        <div className={Styles.lollyForm}>
+          <Formik
+            initialValues={initialStateOfValues}
+            onSubmit={async (values) => {
+               await createLolly({
+                 variables : {
+                   senderName : values.senderName,
+                   recipient : values.recipient,
+                   msg : values.msg,
+                   lollyTop : lollyTop,
+                   lollyMid : lollyMid,
+                   lollyBotm : lollyBot
+                 }
+               })
+               values = {
+                 msg :"",
+                 senderName: "",
+                 recipient : ""
+               }
+            }}
+          >
+            {formik => (
+              // <div className={Styles.lollyForm}>
+              <form onSubmit={formik.handleSubmit} className={Styles.form}>
                 <label>To</label>
                 <input
-                  value={formik.values.reciptentName}
+                  value={formik.values.recipient}
                   onChange={formik.handleChange}
-                  name="reciptentName"
+                  name="recipient"
                   required
                   type="text"
                   placeholder="a lolly for"
@@ -119,17 +146,16 @@ const CreateLolly = () => {
                   type="text"
                   placeholder="a lolly form"
                 />
-                <button type="submit" className={styles.formBtn}>
+                <button type="submit" className={Styles.formBtn}>
                   Freeze this lolly and get a link
                 </button>
               </form>
-            </div>
-          )}
-        </Formik>
+              // </div>
+            )}
+          </Formik>
+        </div>
       </div>
     </Layout>
   )
 }
 export default CreateLolly
-
-
