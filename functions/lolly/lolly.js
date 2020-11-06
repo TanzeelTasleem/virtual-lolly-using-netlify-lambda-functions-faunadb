@@ -32,17 +32,30 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     getLollies: async () => {
-      return [
-        {
-          senderName: "bhfdshbfdsbj",
-          recipient: "bhfdshbfdsbj",
-          msg: "bhfdshbfdsbj",
-          lollyTop: "bhfdshbfdsbj",
-          lollyMid: "bhfdshbfdsbj",
-          lollyBotm: "bhfdshbfdsbj",
-          lollyPath : "url"
-        },
-      ]
+      const client = new faunadb.Client({
+        secret: process.env.FAUNA_SECRET,
+      })
+      try {
+        const result = await client.query(
+          q.Map(
+            q.Paginate(q.Documents(q.Collection("lollies"))),
+            q.Lambda(x => q.Get(x))
+          )
+        )
+        return result.data.map(item => {
+          return {
+            senderName : item.data.senderName,
+            recipient: item.data.recipient,
+            msg: item.data.msg,
+            lollyTop: item.data.lollyTop,
+            lollyMid: item.data.lollyMid,
+            lollyBotm: item.data.lollyBotm,
+            lollyPath : item.data.lollyPath 
+          }
+        })
+      } catch (error) {
+        return error.message
+      }
     },
   },
   Mutation: {
@@ -55,17 +68,11 @@ const resolvers = {
           const result = await client.query(
             q.Create(q.Collection("lollies"),{
               data : args
-              // data: {
-              //   senderName: args.senderName,
-              //   recipient: args.recipient,
-              //   msg: args.msg,
-              //   lollyTop: args.lollyTop,
-              //   lollyMid: args.lollyMid,
-              //   lollyBotm: args.lollyBotm,
-              //   url :  id           
-              // },
             })
           )
+          const response = await axios.post('https://api.netlify.com/build_hooks/5fa44d2cb92311009001d836')
+          console.log(await response)
+         
           return {
             senderName : result.data.senderName,
             recipient: result.data.recipient,
@@ -79,14 +86,6 @@ const resolvers = {
           return error.message
         }
       }
-      // return {
-      //   senderName: args.senderName,
-      //   recipient: args.recipient,
-      //   msg: args.msg,
-      //   lollyTop: args.lollyTop,
-      //   lollyMid: args.lollyMid,
-      //   lollyBotm: args.lollyBotm,
-      // }
     },
   }
 const server = new ApolloServer({
