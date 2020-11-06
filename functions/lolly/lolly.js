@@ -1,13 +1,14 @@
 const { ApolloServer, gql } = require("apollo-server-lambda")
-const axios = require('axios')
+const axios = require("axios")
 const faunadb = require("faunadb")
 const q = faunadb.query
-const shortid = require('shortid');
+const shortid = require("shortid")
 require("dotenv").config()
 
 const typeDefs = gql`
   type Query {
     getLollies: [lolly]
+    getLolly(path: String!): lolly
   }
   type lolly {
     senderName: String!
@@ -16,7 +17,7 @@ const typeDefs = gql`
     lollyTop: String!
     lollyMid: String!
     lollyBotm: String!
-    lollyPath : String!
+    lollyPath: String!
   }
   type Mutation {
     createLolly(
@@ -44,15 +45,36 @@ const resolvers = {
         )
         return result.data.map(item => {
           return {
-            senderName : item.data.senderName,
+            senderName: item.data.senderName,
             recipient: item.data.recipient,
             msg: item.data.msg,
             lollyTop: item.data.lollyTop,
             lollyMid: item.data.lollyMid,
             lollyBotm: item.data.lollyBotm,
-            lollyPath : item.data.lollyPath 
+            lollyPath: item.data.lollyPath,
           }
         })
+      } catch (error) {
+        return error.message
+      }
+    },
+    getLolly: async (_, args) => {
+      const client = new faunadb.Client({
+        secret: process.env.FAUNA_SECRET,
+      })
+      try {
+        const result = await client.query(
+          q.Get(q.Match(q.Index("lolly_path"), `${args.path}`))
+        )
+        return {
+          senderName: result.data.senderName,
+          recipient: result.data.recipient,
+          msg: result.data.msg,
+          lollyTop: result.data.lollyTop,
+          lollyMid: result.data.lollyMid,
+          lollyBotm: result.data.lollyBotm,
+          lollyPath: result.data.lollyPath,
+        }
       } catch (error) {
         return error.message
       }
@@ -60,33 +82,35 @@ const resolvers = {
   },
   Mutation: {
     createLolly: async (_, args) => {
-        const client = new faunadb.Client({
-          secret: process.env.FAUNA_SECRET,
-        })
-        args.lollyPath = shortid.generate();
-        try {
-          const result = await client.query(
-            q.Create(q.Collection("lollies"),{
-              data : args
-            })
-          )
-          const response = await axios.post('https://api.netlify.com/build_hooks/5fa44d2cb92311009001d836')         
-          
-          return {
-            senderName : result.data.senderName,
-            recipient: result.data.recipient,
-            msg: result.data.msg,
-            lollyTop: result.data.lollyTop,
-            lollyMid: result.data.lollyMid,
-            lollyBotm: result.data.lollyBotm,
-            lollyPath : result.data.lollyPath 
+      const client = new faunadb.Client({
+        secret: process.env.FAUNA_SECRET,
+      })
+      args.lollyPath = shortid.generate()
+      try {
+        const result = await client.query(
+          q.Create(q.Collection("lollies"), {
+            data: args,
+          })
+        )
+        const response = await axios.post(
+          "https://api.netlify.com/build_hooks/5fa44d2cb92311009001d836"
+        )
+
+        return {
+          senderName: result.data.senderName,
+          recipient: result.data.recipient,
+          msg: result.data.msg,
+          lollyTop: result.data.lollyTop,
+          lollyMid: result.data.lollyMid,
+          lollyBotm: result.data.lollyBotm,
+          lollyPath: result.data.lollyPath,
         }
-        } catch (error) {
-          return error.message
-        }
+      } catch (error) {
+        return error.message
       }
     },
-  }
+  },
+}
 const server = new ApolloServer({
   typeDefs,
   resolvers,

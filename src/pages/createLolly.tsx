@@ -4,7 +4,7 @@ import Lolly from "../components/svg/svg"
 import Styles from "./createLolly.module.css"
 import { Formik, FormikErrors } from "formik"
 import { gql, useMutation } from "@apollo/client"
-
+import { navigate } from "gatsby"
 interface initialValues {
   senderName: string
   recipient: string
@@ -19,40 +19,39 @@ const initialStateOfValues: initialValues = {
   msg: "",
 }
 
-const createVirtualLolly=gql`
-mutation createLolly(
-  $senderName: String!
-  $recipient: String!
-  $msg: String!
-  $lollyTop: String!
-  $lollyMid: String!
-  $lollyBotm: String!
-) {
-  createLolly(
-    senderName: $senderName
-    recipient: $recipient
-    msg: $msg
-    lollyTop: $lollyTop
-    lollyMid: $lollyMid
-    lollyBotm: $lollyBotm
+const createVirtualLolly = gql`
+  mutation createLolly(
+    $senderName: String!
+    $recipient: String!
+    $msg: String!
+    $lollyTop: String!
+    $lollyMid: String!
+    $lollyBotm: String!
   ) {
-    senderName
-    msg
-    recipient
-    lollyTop
-    lollyMid
-    lollyBotm
-    lollyPath
+    createLolly(
+      senderName: $senderName
+      recipient: $recipient
+      msg: $msg
+      lollyTop: $lollyTop
+      lollyMid: $lollyMid
+      lollyBotm: $lollyBotm
+    ) {
+      senderName
+      msg
+      recipient
+      lollyTop
+      lollyMid
+      lollyBotm
+      lollyPath
+    }
   }
-}
-
 `
 
 const CreateLolly = () => {
   const [lollyTop, setlollyTop] = useState<string>("#f54c6b")
   const [lollyMid, setlollyMid] = useState<string>("#FF0000")
   const [lollyBot, setlollyBot] = useState<string>("#6e2633")
-  const [createLolly] = useMutation(createVirtualLolly)
+  const [createLolly, { loading, data }] = useMutation(createVirtualLolly)
   return (
     <Layout>
       <div className={Styles.container}>
@@ -98,26 +97,28 @@ const CreateLolly = () => {
         <div className={Styles.lollyForm}>
           <Formik
             initialValues={initialStateOfValues}
-            onSubmit={async (values) => {
-               await createLolly({
-                 variables : {
-                   senderName : values.senderName,
-                   recipient : values.recipient,
-                   msg : values.msg,
-                   lollyTop : lollyTop,
-                   lollyMid : lollyMid,
-                   lollyBotm : lollyBot
-                 }
-               })
-               values = {
-                 msg :"",
-                 senderName: "",
-                 recipient : ""
-               }
+            onSubmit={async (values, { setSubmitting }) => {
+              await createLolly({
+                variables: {
+                  senderName: values.senderName,
+                  recipient: values.recipient,
+                  msg: values.msg,
+                  lollyTop: lollyTop,
+                  lollyMid: lollyMid,
+                  lollyBotm: lollyBot,
+                },
+              }).then(res => {
+                setSubmitting(false)
+                navigate(`/${res.data.createLolly.lollyPath}`)
+              })
+              values = {
+                msg: "",
+                senderName: "",
+                recipient: "",
+              }
             }}
           >
             {formik => (
-              // <div className={Styles.lollyForm}>
               <form onSubmit={formik.handleSubmit} className={Styles.form}>
                 <label>To</label>
                 <input
@@ -146,11 +147,14 @@ const CreateLolly = () => {
                   type="text"
                   placeholder="a lolly form"
                 />
-                <button type="submit" className={Styles.formBtn}>
+                <button
+                  type="submit"
+                  className={Styles.formBtn}
+                  disabled={formik.isSubmitting}
+                >
                   Freeze this lolly and get a link
                 </button>
               </form>
-              // </div>
             )}
           </Formik>
         </div>
