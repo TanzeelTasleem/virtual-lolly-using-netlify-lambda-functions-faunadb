@@ -7,7 +7,7 @@ const lollyDetailPage :React.FC <any> = ({pageContext}) => {
     return (
         <Layout>
             <div className={styles.container}>
-            <Lolly fillLollyTop="#3100f5" fillLollyBottom="#4221f5" fillLollyMiddle="#4287f5" />
+            <Lolly fillLollyTop={pageContext.lolly.lollyTop} fillLollyBottom={pageContext.lolly.lollyBotm} fillLollyMiddle={pageContext.lolly.lollyMid} />
             <div className={styles.detailBox}>
                     <p className={styles.details}>{pageContext.lolly.senderName}</p>
                     <p className={styles.details} style={{fontFamily : "monospace" , fontSize:"20px"}} >{pageContext.lolly.msg}</p>
