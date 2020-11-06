@@ -13,6 +13,17 @@ module.exports = {
       //   allExtensions: true, // defaults to false
       // },
     },
+    {
+      resolve: "gatsby-source-graphql",
+      options: {
+        // Arbitrary name for the remote schema Query type
+        typeName: "virtualLollies",
+        // Field under which the remote schema will be accessible. You'll use this in your Gatsby query
+        fieldName: "lollies",
+        // Url to query from
+        url: "https://trusting-hodgkin-a009ff.netlify.app/.netlify/functions/lolly",
+      },
+    },
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,

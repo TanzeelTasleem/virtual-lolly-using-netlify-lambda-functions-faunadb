@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "apollo-server-lambda": "^2.19.0",
+    "axios": "^0.21.0",
     "faunadb": "^3.0.1",
     "shortid": "^2.2.16"
   }

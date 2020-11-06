@@ -1,7 +1,26 @@
-/**
- * Implement Gatsby's Node APIs in this file.
- *
- * See: https://www.gatsbyjs.com/docs/node-apis/
- */
-
-// You can delete this file if you're not using it
+exports.createPages = async ({graphql ,actions})=>{
+    const response = await graphql(`
+     query MyQuery {
+        lollies {
+          getLollies {
+            senderName
+            recipient
+            msg
+            lollyTop
+            lollyPath
+            lollyMid
+            lollyBotm
+          }
+        }
+       }
+    `)
+    response.data.lollies.getLollies.forEach((lolly)=>{
+       actions.createPage({
+           path : `/${lolly.lollyPath}`,
+           component : require.resolve('./src/templates/lollyDetailPage.tsx'),
+           context : {
+               lolly
+           }
+       })
+    })
+}

@@ -1,5 +1,5 @@
 const { ApolloServer, gql } = require("apollo-server-lambda")
-
+const axios = require('axios')
 const faunadb = require("faunadb")
 const q = faunadb.query
 const shortid = require('shortid');
@@ -70,9 +70,8 @@ const resolvers = {
               data : args
             })
           )
-          const response = await axios.post('https://api.netlify.com/build_hooks/5fa44d2cb92311009001d836')
-          console.log(await response)
-         
+          const response = await axios.post('https://api.netlify.com/build_hooks/5fa44d2cb92311009001d836')         
+          
           return {
             senderName : result.data.senderName,
             recipient: result.data.recipient,
