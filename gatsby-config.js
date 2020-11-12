@@ -21,7 +21,7 @@ module.exports = {
         // Field under which the remote schema will be accessible. You'll use this in your Gatsby query
         fieldName: "lollies",
         // Url to query from
-        url: "https://trusting-hodgkin-a009ff.netlify.app/.netlify/functions/lolly",
+        url: "https://virtuallolly.netlify.app/.netlify/functions/lolly",
       },
     },
     `gatsby-plugin-react-helmet`,
